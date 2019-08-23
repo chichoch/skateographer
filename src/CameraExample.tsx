@@ -3,6 +3,7 @@ import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import CameraRoll from '@react-native-community/cameraroll';
 
 import {RNCamera} from 'react-native-camera';
+import Slider from "@react-native-community/slider";
 
 const PendingView = () => (
     <View
@@ -17,29 +18,27 @@ const PendingView = () => (
     </View>
 );
 
-interface State {
-    isRecording: boolean;
-    videoUri: string;
-    hasRecorded: boolean;
-}
-
 export class CameraExample extends PureComponent {
     state = {
         isRecording: false,
         videoUri: '',
         hasRecorded: false,
+        zoom: 0,
     };
 
+    onZoomChanged(value: number) {
+        this.setState({zoom: value});
+    }
 
     render() {
         const buttonText = this.state.isRecording ? 'STOP' : 'START';
-        const {hasRecorded, videoUri, isRecording} = this.state;
+        const {hasRecorded, videoUri, isRecording, zoom} = this.state;
         return (
             <View style={styles.container}>
                 <RNCamera
                     style={styles.preview}
                     type={RNCamera.Constants.Type.back}
-
+                    zoom={zoom}
                     androidCameraPermissionOptions={{
                         title: 'Permission to use camera',
                         message: 'We need your permission to use your camera',
@@ -65,6 +64,12 @@ export class CameraExample extends PureComponent {
                                     <TouchableOpacity onPress={() => this.discardVideo()} style={styles.capture}>
                                         <Text style={{fontSize: 14}}> DISCARD </Text>
                                     </TouchableOpacity>
+                                    <Slider
+                                        style={{position: 'absolute', right: 20, bottom: 20, width: 40, height: 400}}
+                                        minimumValue={0}
+                                        maximumValue={1}
+                                        onValueChange={x => this.onZoomChanged(x)}
+                                    />
                                 </View>)
                         }
                         return (
@@ -72,6 +77,12 @@ export class CameraExample extends PureComponent {
                                 <TouchableOpacity onPress={() => this.takeVideo(camera)} style={styles.capture}>
                                     <Text style={{fontSize: 14}}> {buttonText} </Text>
                                 </TouchableOpacity>
+                                <Slider
+                                    style={{position: 'absolute', left: 20, bottom: 220, width: 400, height: 40, transform: [{ rotate: '270deg'}]}}
+                                    minimumValue={0}
+                                    maximumValue={0.05}
+                                    onValueChange={x => this.onZoomChanged(x)}
+                                />
                             </View>
                         );
                     }}
