@@ -27,11 +27,13 @@ export class CameraExample extends PureComponent {
     state = {
         isRecording: false,
         videoUri: '',
+        hasRecorded: false,
     };
 
 
     render() {
         const buttonText = this.state.isRecording ? 'STOP' : 'START';
+        const {hasRecorded, videoUri, isRecording} = this.state;
         return (
             <View style={styles.container}>
                 <RNCamera
@@ -53,6 +55,18 @@ export class CameraExample extends PureComponent {
                 >
                     {({camera, status, recordAudioPermissionStatus}) => {
                         if (status !== 'READY') return <PendingView/>;
+                        if (hasRecorded) {
+                            return (
+                                <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
+                                    <TouchableOpacity onPress={() => this.saveVideoToCameraRoll(videoUri)}
+                                                      style={styles.capture}>
+                                        <Text style={{fontSize: 14}}> SAVE </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.discardVideo()} style={styles.capture}>
+                                        <Text style={{fontSize: 14}}> DISCARD </Text>
+                                    </TouchableOpacity>
+                                </View>)
+                        }
                         return (
                             <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
                                 <TouchableOpacity onPress={() => this.takeVideo(camera)} style={styles.capture}>
@@ -68,20 +82,32 @@ export class CameraExample extends PureComponent {
 
     takeVideo(camera: RNCamera) {
         const uri = this.state.videoUri;
-        this.state.isRecording ? this.stopRecording(camera).catch(x => console.log('SAVE ERROR!', x)) : this.startRecording(camera);
-        this.setState({
-            isRecording: !this.state.isRecording,
-        });
+        const {isRecording, hasRecorded} = this.state;
+
+        if (isRecording) {
+            this.stopRecording(camera).catch(x => console.log('STOP ERROR!', x));
+        } else {
+            this.setState({isRecording: true});
+            this.startRecording(camera)
+                .then(uri => this.setState({videoUri: uri, hasRecorded: true, isRecording: false}));
+        }
+    }
+
+    discardVideo() {
+        this.setState({hasRecorded: false})
     }
 
     startRecording = async function (camera: RNCamera) {
+        console.log('Started recording');
         const data = await camera.recordAsync()
-            .then(data => CameraRoll.saveToCameraRoll(data.uri))
-            .then(() => Alert.alert('Success', 'Video saved!'))
+            .then(x => {
+                console.log('Finished recording', x.uri);
+                return x.uri;
+            })
             .catch(e => console.log('ERROR', e));
-        console.log('Saved to camera roll:', data);
         return data;
     };
+
 
     stopRecording = async function (camera: RNCamera) {
         const data = await camera.stopRecording();
@@ -90,9 +116,12 @@ export class CameraExample extends PureComponent {
     };
 
     saveVideoToCameraRoll(uri: string) {
-        const data = CameraRoll.saveToCameraRoll(uri, 'video');
+        const data = CameraRoll.saveToCameraRoll(uri, 'video')
+            .then(() => Alert.alert('Success', 'Video saved!'))
+            .then(() => this.setState({hasRecorded: false}))
+            .catch(e => console.log('ERROR', e));
         console.log('Saved to camera roll:', uri);
-    }
+    };
 
     takePicture = async function (camera: RNCamera) {
         const options = {quality: 0.5, base64: true};
