@@ -10,6 +10,7 @@
   "dependencies": {
     "@react-native-community/cameraroll": "^1.2.1",
     "@react-native-community/slider": "^2.0.0",
+    "eslint-utils": "^1.4.1",
     "react": "16.8.6",
     "react-native": "0.60.5",
     "react-native-camera": "^3.1.1"
