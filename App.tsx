@@ -13,9 +13,9 @@ import {CameraExample} from "./src/CameraExample";
 
 const App = () => {
 
-    return (
-        <CameraExample/>
-    );
+  return (
+    <CameraExample/>
+  );
 };
 
 export default App;
