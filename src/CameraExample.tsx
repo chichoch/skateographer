@@ -5,17 +5,39 @@ import CameraRoll from '@react-native-community/cameraroll';
 import {RNCamera} from 'react-native-camera';
 import {ButtonComponent} from "./ButtonComponent";
 import {PendingView} from "./PendingView";
+import {
+  PanGestureHandler,
+  PanGestureHandlerGestureEvent,
+  PinchGestureHandler,
+  PinchGestureHandlerGestureEvent,
+} from 'react-native-gesture-handler';
 
 export class CameraExample extends PureComponent {
+  pinchRef = React.createRef();
   state = {
     isRecording: false,
     videoUri: '',
     hasRecorded: false,
     zoom: 0,
+    bajs: 'TEST',
   };
 
   onZoomChanged(value: number) {
     this.setState({zoom: value});
+  }
+
+  onGestureHandler(event: PinchGestureHandlerGestureEvent) {
+    let newZoom = this.state.zoom + (event.nativeEvent.velocity / 1500);
+    const s = `Zoom: ${newZoom} velocity: ${event.nativeEvent.velocity}`;
+    if (newZoom > 1) {
+      newZoom = 1;
+    } else if (newZoom < 0) {
+      newZoom = 0;
+    }
+    this.setState({
+      bajs: s,
+      zoom: newZoom,
+    });
   }
 
   render() {
@@ -43,15 +65,25 @@ export class CameraExample extends PureComponent {
           {({camera, status, recordAudioPermissionStatus}) => {
             if (status !== 'READY') return <PendingView/>;
             return (
-              <ButtonComponent
-                isRecording={isRecording}
-                hasRecorded={hasRecorded}
-                onTakeVideo={(camera: RNCamera) => this.takeVideo(camera)}
-                onSave={(uri: string) => this.saveVideoToCameraRoll(uri)}
-                onDiscard={() => this.discardVideo()}
-                onZoomChanged={(x: number) => this.onZoomChanged(x)}
-                videoUri={videoUri}
-                camera={camera}/>)
+              <View>
+                <PinchGestureHandler
+                  onGestureEvent={(x: PinchGestureHandlerGestureEvent) => this.onGestureHandler(x)}
+                >
+                  <View>
+                    <Text>{this.state.bajs}</Text>
+                    <ButtonComponent
+                      isRecording={isRecording}
+                      hasRecorded={hasRecorded}
+                      onTakeVideo={(camera: RNCamera) => this.takeVideo(camera)}
+                      onSave={(uri: string) => this.saveVideoToCameraRoll(uri)}
+                      onDiscard={() => this.discardVideo()}
+                      onZoomChanged={(x: number) => this.onZoomChanged(x)}
+                      videoUri={videoUri}
+                      camera={camera}/>
+                  </View>
+                </PinchGestureHandler>
+              </View>
+            )
           }}
         </RNCamera>
       </View>

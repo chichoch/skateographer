@@ -49,12 +49,13 @@ type ZoomSliderProps = {
 }
 
 const ZoomSlider = ({onZoomChanged}: ZoomSliderProps) => (
-  <Slider
+  <View/>
+  /*<Slider
     style={styles.slider}
     minimumValue={0}
-    maximumValue={0.05}
+    maximumValue={1}
     onValueChange={x => onZoomChanged(x)}
-  />
+  />*/
 );
 
 
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 15,
     paddingHorizontal: 20,
-    alignSelf: 'center',
+    alignSelf: 'flex-end',
     margin: 20,
   },
   slider: {
