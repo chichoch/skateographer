@@ -1,22 +1,10 @@
 import React, {PureComponent} from 'react';
-import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, StyleSheet, Text, View} from 'react-native';
 import CameraRoll from '@react-native-community/cameraroll';
 
 import {RNCamera} from 'react-native-camera';
-import Slider from "@react-native-community/slider";
-
-const PendingView = () => (
-  <View
-    style={{
-      flex: 1,
-      backgroundColor: 'lightgreen',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    <Text>Waiting</Text>
-  </View>
-);
+import {ButtonComponent} from "./ButtonComponent";
+import {PendingView} from "./PendingView";
 
 export class CameraExample extends PureComponent {
   state = {
@@ -54,44 +42,16 @@ export class CameraExample extends PureComponent {
         >
           {({camera, status, recordAudioPermissionStatus}) => {
             if (status !== 'READY') return <PendingView/>;
-            if (hasRecorded) {
-              return (
-                <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
-                  <TouchableOpacity onPress={() => this.saveVideoToCameraRoll(videoUri)}
-                                    style={styles.capture}>
-                    <Text style={{fontSize: 14}}> SAVE </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.discardVideo()} style={styles.capture}>
-                    <Text style={{fontSize: 14}}> DISCARD </Text>
-                  </TouchableOpacity>
-                  <Slider
-                    style={{position: 'absolute', right: 20, bottom: 20, width: 40, height: 400}}
-                    minimumValue={0}
-                    maximumValue={1}
-                    onValueChange={x => this.onZoomChanged(x)}
-                  />
-                </View>)
-            }
             return (
-              <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
-                <TouchableOpacity onPress={() => this.takeVideo(camera)} style={styles.capture}>
-                  <Text style={{fontSize: 14}}> {buttonText} </Text>
-                </TouchableOpacity>
-                <Slider
-                  style={{
-                    position: 'absolute',
-                    left: 20,
-                    bottom: 220,
-                    width: 400,
-                    height: 40,
-                    transform: [{rotate: '270deg'}]
-                  }}
-                  minimumValue={0}
-                  maximumValue={0.05}
-                  onValueChange={x => this.onZoomChanged(x)}
-                />
-              </View>
-            );
+              <ButtonComponent
+                isRecording={isRecording}
+                hasRecorded={hasRecorded}
+                onTakeVideo={(camera: RNCamera) => this.takeVideo(camera)}
+                onSave={(uri: string) => this.saveVideoToCameraRoll(uri)}
+                onDiscard={() => this.discardVideo()}
+                onZoomChanged={(x: number) => this.onZoomChanged(x)}
+                videoUri={videoUri}
+                camera={camera}/>)
           }}
         </RNCamera>
       </View>
@@ -139,13 +99,6 @@ export class CameraExample extends PureComponent {
       .then(() => this.setState({hasRecorded: false}))
       .catch(e => console.log('ERROR', e));
     console.log('Saved to camera roll:', uri);
-  };
-
-  takePicture = async function (camera: RNCamera) {
-    const options = {quality: 0.5, base64: true};
-    const data = await camera.takePictureAsync(options);
-    //  eslint-disable-next-line
-    console.log(data.uri);
   };
 }
 
