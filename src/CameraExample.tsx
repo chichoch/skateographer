@@ -75,11 +75,11 @@ export class CameraExample extends PureComponent {
             {({camera, status, recordAudioPermissionStatus}) => {
               if (status !== 'READY') return <PendingView/>;
               return (
-                <View>
+                <View style={{flex: 1, width: '100%'}}>
                   <PinchGestureHandler
                     onGestureEvent={(x: PinchGestureHandlerGestureEvent) => this.onGestureHandler(x)}
                   >
-                    <View>
+                    <View style={{flex: 1, justifyContent: 'flex-end'}}>
                       <Text>{this.state.debug}</Text>
                       <ButtonComponent
                         isRecording={isRecording}
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: 'black',
+    backgroundColor: 'white',
     justifyContent: 'center',
   },
   bounding: {
