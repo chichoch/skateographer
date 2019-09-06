@@ -5,7 +5,6 @@ import CameraRoll from '@react-native-community/cameraroll';
 import {RNCamera} from 'react-native-camera';
 import {ButtonComponent} from "./ButtonComponent";
 import {PendingView} from "./PendingView";
-import {PinchGestureHandler, PinchGestureHandlerGestureEvent,} from 'react-native-gesture-handler';
 import Orientation from "react-native-orientation-locker";
 
 export class CameraExample extends PureComponent {
@@ -15,23 +14,9 @@ export class CameraExample extends PureComponent {
     videoUri: '',
     hasRecorded: false,
     zoom: 0,
-    debug: 'TEST',
     orientation: 'PORTRAIT',
   };
 
-  onGestureHandler(event: PinchGestureHandlerGestureEvent) {
-    let newZoom = this.state.zoom + (event.nativeEvent.velocity / 1500);
-    const s = `Zoom: ${newZoom} velocity: ${event.nativeEvent.velocity}`;
-    if (newZoom > 1) {
-      newZoom = 1;
-    } else if (newZoom < 0) {
-      newZoom = 0;
-    }
-    this.setState({
-      debug: s,
-      zoom: newZoom,
-    });
-  }
 
   componentDidMount() {
     Orientation.lockToPortrait();
@@ -76,23 +61,18 @@ export class CameraExample extends PureComponent {
               if (status !== 'READY') return <PendingView/>;
               return (
                 <View style={{flex: 1, width: '100%'}}>
-                  <PinchGestureHandler
-                    onGestureEvent={(x: PinchGestureHandlerGestureEvent) => this.onGestureHandler(x)}
-                  >
-                    <View style={{flex: 1, justifyContent: 'flex-end'}}>
-                      <Text>{this.state.debug}</Text>
-                      <ButtonComponent
-                        isRecording={isRecording}
-                        hasRecorded={hasRecorded}
-                        onTakeVideo={(camera: RNCamera) => this.takeVideo(camera)}
-                        onSave={(uri: string) => this.saveVideoToCameraRoll(uri)}
-                        onDiscard={() => this.discardVideo()}
-                        videoUri={videoUri}
-                        camera={camera}
-                        orientation={orientation}
-                      />
-                    </View>
-                  </PinchGestureHandler>
+                  <View style={{flex: 1, justifyContent: 'flex-end'}}>
+                    <ButtonComponent
+                      isRecording={isRecording}
+                      hasRecorded={hasRecorded}
+                      onTakeVideo={(camera: RNCamera) => this.takeVideo(camera)}
+                      onSave={(uri: string) => this.saveVideoToCameraRoll(uri)}
+                      onDiscard={() => this.discardVideo()}
+                      videoUri={videoUri}
+                      camera={camera}
+                      orientation={orientation}
+                    />
+                  </View>
                 </View>
               )
             }}
@@ -156,7 +136,7 @@ const styles = StyleSheet.create({
   bounding: {
     flex: 0,
     width: '100%',
-    aspectRatio: 9/16, // TODO Needs to work
+    aspectRatio: 9 / 16,
   },
   preview: {
     flex: 1,
