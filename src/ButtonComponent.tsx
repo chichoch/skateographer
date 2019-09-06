@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View, ViewStyle} from "react-native";
 import Slider from "@react-native-community/slider";
 import {RNCamera} from "react-native-camera";
 
@@ -9,55 +9,59 @@ interface Props {
   onTakeVideo: (camera: RNCamera) => void;
   onSave: (uri: string) => void;
   onDiscard: () => void;
-  onZoomChanged: (x: number) => void;
   videoUri: string;
   camera: RNCamera;
+  orientation: string;
 }
 
 export class ButtonComponent extends React.Component<Props> {
 
+  getOrientationRotation = (orientation: string): string => {
+    switch (orientation) {
+      case 'PORTRAIT':
+        return '0deg';
+      case 'LANDSCAPE-LEFT':
+        return '90deg';
+      case 'LANDSCAPE-RIGHT':
+        return '270deg';
+      case 'PORTRAIT-UPSIDEDOWN':
+        return '180deg';
+      default:
+        return '0deg';
+    }
+  };
+
   render() {
-    const {isRecording, hasRecorded, onTakeVideo, onSave, onDiscard, onZoomChanged, videoUri, camera} = this.props;
-    const buttonText = isRecording ? 'STOP' : 'START';
+    const {isRecording, hasRecorded, onTakeVideo, onSave, onDiscard, videoUri, camera, orientation} = this.props;
+    const buttonText = isRecording ? 'STOP' : 'REC';
+
+    const rotateStyle = {
+      transform: [{ rotate: this.getOrientationRotation(orientation) }]
+    } as ViewStyle;
+
+    const recStyle = isRecording ? styles.discard : styles.rec;
 
     if (hasRecorded) {
       return (
         <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
           <TouchableOpacity onPress={() => onSave(videoUri)}
-                            style={styles.capture}>
-            <Text style={{fontSize: 14}}> SAVE </Text>
+                            style={[styles.capture, rotateStyle, styles.save]}>
+            <Text style={styles.buttonText}> SAVE </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => onDiscard()} style={styles.capture}>
-            <Text style={{fontSize: 14}}> DISCARD </Text>
+          <TouchableOpacity onPress={() => onDiscard()} style={[styles.capture, rotateStyle, styles.discard]}>
+            <Text style={styles.buttonText}> DISCARD </Text>
           </TouchableOpacity>
-          <ZoomSlider onZoomChanged={x => onZoomChanged(x)}/>
         </View>)
     }
     return (
       <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
-        <TouchableOpacity onPress={() => onTakeVideo(camera)} style={styles.capture}>
-          <Text style={{fontSize: 14}}> {buttonText} </Text>
+        <TouchableOpacity onPress={() => onTakeVideo(camera)} style={[styles.capture, rotateStyle, recStyle]}>
+          <Text style={styles.buttonText}> {buttonText} </Text>
         </TouchableOpacity>
-        <ZoomSlider onZoomChanged={x => onZoomChanged(x)}/>
       </View>
     );
   }
 }
-
-type ZoomSliderProps = {
-  onZoomChanged: (x: number) => void;
-}
-
-const ZoomSlider = ({onZoomChanged}: ZoomSliderProps) => (
-  <View/>
-  /*<Slider
-    style={styles.slider}
-    minimumValue={0}
-    maximumValue={1}
-    onValueChange={x => onZoomChanged(x)}
-  />*/
-);
-
 
 const styles = StyleSheet.create({
   container: {
@@ -72,12 +76,24 @@ const styles = StyleSheet.create({
   },
   capture: {
     flex: 0,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    padding: 15,
-    paddingHorizontal: 20,
+    borderRadius: 25,
+    padding: 25,
     alignSelf: 'flex-end',
     margin: 20,
+  },
+  rec: {
+    backgroundColor: '#8a0f0f',
+  },
+  save: {
+    backgroundColor: 'green',
+  },
+  discard: {
+    backgroundColor: '#c70c0c',
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: 'white',
   },
   slider: {
     position: 'absolute',

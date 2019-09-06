@@ -6,6 +6,7 @@ import {RNCamera} from 'react-native-camera';
 import {ButtonComponent} from "./ButtonComponent";
 import {PendingView} from "./PendingView";
 import {PinchGestureHandler, PinchGestureHandlerGestureEvent,} from 'react-native-gesture-handler';
+import Orientation from "react-native-orientation-locker";
 
 export class CameraExample extends PureComponent {
   pinchRef = React.createRef();
@@ -14,12 +15,9 @@ export class CameraExample extends PureComponent {
     videoUri: '',
     hasRecorded: false,
     zoom: 0,
-    bajs: 'TEST',
+    debug: 'TEST',
+    orientation: 'PORTRAIT',
   };
-
-  onZoomChanged(value: number) {
-    this.setState({zoom: value});
-  }
 
   onGestureHandler(event: PinchGestureHandlerGestureEvent) {
     let newZoom = this.state.zoom + (event.nativeEvent.velocity / 1500);
@@ -30,57 +28,76 @@ export class CameraExample extends PureComponent {
       newZoom = 0;
     }
     this.setState({
-      bajs: s,
+      debug: s,
       zoom: newZoom,
     });
   }
 
+  componentDidMount() {
+    Orientation.lockToPortrait();
+    Orientation.addDeviceOrientationListener(this.orientationDidChange);
+  }
+
+  componentWillUnmount() {
+    Orientation.removeDeviceOrientationListener(this.orientationDidChange);
+  }
+
+  orientationDidChange = (orientation: string) => {
+    console.log(orientation);
+    if (orientation !== 'UNKNOWN') {
+      this.setState({orientation})
+    }
+  };
+
   render() {
-    const buttonText = this.state.isRecording ? 'STOP' : 'START';
-    const {hasRecorded, videoUri, isRecording, zoom} = this.state;
+    const {hasRecorded, videoUri, isRecording, zoom, orientation} = this.state;
     return (
       <View style={styles.container}>
-        <RNCamera
-          style={styles.preview}
-          type={RNCamera.Constants.Type.back}
-          zoom={zoom}
-          androidCameraPermissionOptions={{
-            title: 'Permission to use camera',
-            message: 'We need your permission to use your camera',
-            buttonPositive: 'Ok',
-            buttonNegative: 'Cancel',
-          }}
-          androidRecordAudioPermissionOptions={{
-            title: 'Permission to use audio recording',
-            message: 'We need your permission to use your audio',
-            buttonPositive: 'Ok',
-            buttonNegative: 'Cancel',
-          }}
-        >
-          {({camera, status, recordAudioPermissionStatus}) => {
-            if (status !== 'READY') return <PendingView/>;
-            return (
-              <View>
-                <PinchGestureHandler
-                  onGestureEvent={(x: PinchGestureHandlerGestureEvent) => this.onGestureHandler(x)}
-                >
-                  <View>
-                    <Text>{this.state.bajs}</Text>
-                    <ButtonComponent
-                      isRecording={isRecording}
-                      hasRecorded={hasRecorded}
-                      onTakeVideo={(camera: RNCamera) => this.takeVideo(camera)}
-                      onSave={(uri: string) => this.saveVideoToCameraRoll(uri)}
-                      onDiscard={() => this.discardVideo()}
-                      onZoomChanged={(x: number) => this.onZoomChanged(x)}
-                      videoUri={videoUri}
-                      camera={camera}/>
-                  </View>
-                </PinchGestureHandler>
-              </View>
-            )
-          }}
-        </RNCamera>
+        <View style={styles.bounding}>
+          <RNCamera
+            style={styles.preview}
+            type={RNCamera.Constants.Type.back}
+            zoom={zoom}
+            defaultVideoQuality={RNCamera.Constants.VideoQuality["1080p"]}
+            androidCameraPermissionOptions={{
+              title: 'Permission to use camera',
+              message: 'We need your permission to use your camera',
+              buttonPositive: 'Ok',
+              buttonNegative: 'Cancel',
+            }}
+            androidRecordAudioPermissionOptions={{
+              title: 'Permission to use audio recording',
+              message: 'We need your permission to use your audio',
+              buttonPositive: 'Ok',
+              buttonNegative: 'Cancel',
+            }}
+          >
+            {({camera, status, recordAudioPermissionStatus}) => {
+              if (status !== 'READY') return <PendingView/>;
+              return (
+                <View>
+                  <PinchGestureHandler
+                    onGestureEvent={(x: PinchGestureHandlerGestureEvent) => this.onGestureHandler(x)}
+                  >
+                    <View>
+                      <Text>{this.state.debug}</Text>
+                      <ButtonComponent
+                        isRecording={isRecording}
+                        hasRecorded={hasRecorded}
+                        onTakeVideo={(camera: RNCamera) => this.takeVideo(camera)}
+                        onSave={(uri: string) => this.saveVideoToCameraRoll(uri)}
+                        onDiscard={() => this.discardVideo()}
+                        videoUri={videoUri}
+                        camera={camera}
+                        orientation={orientation}
+                      />
+                    </View>
+                  </PinchGestureHandler>
+                </View>
+              )
+            }}
+          </RNCamera>
+        </View>
       </View>
     );
   }
@@ -134,6 +151,12 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     backgroundColor: 'black',
+    justifyContent: 'center',
+  },
+  bounding: {
+    flex: 0,
+    width: '100%',
+    aspectRatio: 9/16, // TODO Needs to work
   },
   preview: {
     flex: 1,
