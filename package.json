@@ -11,25 +11,25 @@
     "@react-native-community/cameraroll": "^1.2.1",
     "@react-native-community/slider": "^2.0.0",
     "eslint-utils": "^1.4.1",
-    "react": "16.8.6",
+    "react": "16.9.0",
     "react-native": "0.60.5",
-    "react-native-camera": "^3.1.1",
+    "react-native-camera": "^3.3.3",
     "react-native-gesture-handler": "^1.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/runtime": "^7.5.5",
     "@react-native-community/eslint-config": "^0.0.5",
-    "@types/jest": "^24.0.17",
+    "@types/jest": "^24.0.18",
     "@types/react": "^16.9.2",
-    "@types/react-native": "^0.60.5",
+    "@types/react-native": "^0.60.11",
     "@types/react-test-renderer": "^16.9.0",
     "babel-jest": "^24.9.0",
-    "eslint": "^6.1.0",
+    "eslint": "^6.3.0",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.56.0",
-    "react-test-renderer": "16.8.6",
-    "typescript": "^3.5.3"
+    "react-test-renderer": "16.9.0",
+    "typescript": "^3.6.2"
   },
   "jest": {
     "preset": "react-native"

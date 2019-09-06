@@ -5,12 +5,7 @@ import CameraRoll from '@react-native-community/cameraroll';
 import {RNCamera} from 'react-native-camera';
 import {ButtonComponent} from "./ButtonComponent";
 import {PendingView} from "./PendingView";
-import {
-  PanGestureHandler,
-  PanGestureHandlerGestureEvent,
-  PinchGestureHandler,
-  PinchGestureHandlerGestureEvent,
-} from 'react-native-gesture-handler';
+import {PinchGestureHandler, PinchGestureHandlerGestureEvent,} from 'react-native-gesture-handler';
 
 export class CameraExample extends PureComponent {
   pinchRef = React.createRef();
