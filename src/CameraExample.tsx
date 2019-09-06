@@ -44,7 +44,7 @@ export class CameraExample extends PureComponent {
 
   orientationDidChange = (orientation: string) => {
     console.log(orientation);
-    if (orientation !== 'UNKNOWN') {
+    if (orientation !== 'UNKNOWN' && !this.state.isRecording) {
       this.setState({orientation})
     }
   };
