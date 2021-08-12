@@ -12,7 +12,7 @@
     "@react-native-community/slider": "^2.0.0",
     "eslint-utils": "^1.4.1",
     "react": "16.9.0",
-    "react-native": "0.60.5",
+    "react-native": "0.62.3",
     "react-native-camera": "^3.3.3",
     "react-native-gesture-handler": "^1.4.1",
     "react-native-orientation-locker": "^1.1.6"
